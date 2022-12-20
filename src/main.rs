@@ -33,7 +33,12 @@ impl Graph {
 
         for _ in 0..100 {
             pr = self.edges.par_iter().map(|(&u, v)| {
-                let mut contrib = v.par_iter().map(|&v| pr[&v] / self.edges[&v].len() as f64).sum();
+                let mut contrib = v.iter().map(|v| {
+                    if !self.edges.contains_key(v) || v == &u {
+                        return 0.0;
+                    }
+                    pr[v] / self.edges[v].len() as f64
+                }).sum();
                 contrib = 0.85 * contrib + 0.15 / n as f64;
                 (u, contrib)
             }).collect();
